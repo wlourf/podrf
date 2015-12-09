@@ -65,7 +65,11 @@ def parse_config_file(config_file):
         exit (1)
     dict = {}
     config = ConfigParser.RawConfigParser(dict)
-    config.read(config_file)
+    try:
+        config.read(config_file)
+    except:
+        print 'Problème lecture %s : mauvaise structure ?' % config_file
+        exit (1)
     arrSections = config.sections()
 
     if not 'paramètres' in arrSections:
