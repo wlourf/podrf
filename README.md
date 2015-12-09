@@ -1,13 +1,15 @@
 # podrf
 gestion podcasts Radio France
 
-Script python automatisant le téélchargement, le classement,
+Script python automatisant le téléchargement, le classement,
 la conversion et le taggage de podcasts de Radio France (testé 
-sur France Inter et France Culture )
+sur France Inter et France Culture)
 
 Les fichiers sont nommés selon la syntaxe : 
-CODE_EMISSION-DATE-Titre.mp3
-dans le dossier CODE-EMISSION
+
+ CODE_EMISSION-DATE-Titre.mp3
+
+dans le dossier 'CODE-EMISSION'
 
     CODE_EMISSION est défini dans le fichier de configuration
     DATE est au format AAAAMMJJ
