@@ -15,14 +15,13 @@ python-eyed3 pour le taggage
 
 import os, ConfigParser,argparse, urllib2, time, csv
 import xml.etree.ElementTree as ET
-import shutil, subprocess
+import sys, subprocess
 
 try:
     import eyeD3
 except:
     print 'Installer python-eyed3'
-    exit(1)
-    
+    sys.exit(1)
 
 
 
@@ -31,7 +30,6 @@ VERSION = "0.1"
 DESCRIPTION = "Télécharge, renomme, convertit, tague les podcasts issus de pages *.xml,\n" \
               "utiliser les scripts rss_inter.py et rss_culture.py pour récupérer les\n" \
               "pages xml de France Inter et France Culture."
-
 
 
 
@@ -173,7 +171,7 @@ def lecture_rss(emission, arrCatalogue, nombre):
 
         racine  = code + '-' + podcast['date']
 
-        #vérifie si fichier déjà téléchargé (enregistré dnas catalogue, avec la bonne taille)
+        #vérifie si fichier déjà téléchargé (enregistré dans catalogue, avec la bonne taille)
         #arrCatalogueReverse = arrCatalogue.reverse()
         flagDL = True
         for item in reversed(arrCatalogue) :
@@ -239,36 +237,51 @@ def download_podcasts(emission, arrPodcasts, params):
     """
     print '\nTéléchargements :', len(arrPodcasts), 'fichier(s)'
     for pc in arrPodcasts:
+        #file_size_server = int(pc['length'])
+        #la size annoncé par le dictionnaire n'est pas la size réelle du fichier à télécharger
         racine  = emission['nom'] + '-' + pc['date'] 
         title   = clean_file_name(pc['title'])
         pc_file = racine + '-' + title + '.mp3'
         pc_dir  = os.path.join(params['save_dir'], emission['nom'])
-        #print title
-        #print file
-        #print podcast_dir
-        #print
+
         if not os.path.isdir(pc_dir):
             print 'Création dossier : ' + pc_dir 
             os.makedirs(pc_dir)
             
         print racine + ' : ' + title 
         file_name = os.path.join(pc_dir, pc_file)
+        file_name_tmp = file_name + '.tmp'
 
         # Download the file from `url` and save it locally under `file_name`:
         response = urllib2.urlopen(pc['guid']) 
-        fn = open(file_name, 'wb') 
-        shutil.copyfileobj(response, fn)
-        fn.close()
-        #print "Fichier : ", file_name
+
+        file_size_server = int(response.headers['content-length'])
+
+        CHUNK = 16*1024
+        bytes_so_far = 0.0
+
+        with open(file_name_tmp, 'wb') as fp:
+            while True:
+                chunk = response.read(CHUNK)
+                if not chunk:
+                    break
+                bytes_so_far += len(chunk)
+                fp.write(chunk)
+                percent = 100.*bytes_so_far/file_size_server
+                msg = ("\rTéléchargé : %d/%d Mo (%0.1f%%)" % 
+                                (bytes_so_far/1024/1024, file_size_server/1024/1024, percent))
+                sys.stdout.write(msg)
+                sys.stdout.flush()
+        sys.stdout.write ("\r" + " " * len(msg) + "\r")
+        sys.stdout.flush()
+
+        os.rename(file_name_tmp, file_name)
                 
         file_size =  os.path.getsize(file_name)
-        if str(file_size) != pc['length']:
-            #La taille d'un fichier téléchargé ne correpond pas toujours à la taille annoncée
-            #bien que le fichier soit téléchargé correctement
+        if file_size != file_size_server:
             print '\tWarning'
-            print '\tTaille fichier serveur : ', pc['length']
+            print '\tTaille fichier serveur : ', file_size_server
             print '\tTaille fichier local   : ', file_size
-
 
         #convertir le fichier si nécessaire
         args = ['avconv', '-y', '-loglevel', 'error' , '-i', file_name]
@@ -285,7 +298,8 @@ def download_podcasts(emission, arrPodcasts, params):
 
         if flagConvert :
             args.append(file_name + '.tmp.mp3')
-            #print ("Conversion ")
+            sys.stdout.write ("\r Conversion en cours ... \r")
+            sys.stdout.flush()
             subprocess.call(args)
             os.rename (  file_name + '.tmp.mp3' ,  file_name )
 
@@ -361,10 +375,6 @@ def main():
     return 0
 
 
-
-
-
 if __name__ == "__main__":
     status = main()
     exit(status)
-
