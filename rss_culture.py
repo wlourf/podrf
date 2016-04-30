@@ -48,18 +48,15 @@ def get_urls(format=False, filter=""):
     if display :
         print "#", soup.title.text.encode('utf-8'), "\n"
 
-
     for div in soup.find_all('div'):
-        
-        
-        if div.get('class') == [u'item']:
+        if div.get('class') == [u'bloc-teaser',u'concept']:
             #print (div.encode('utf8'))
             for div2 in div.find_all('div'):
                 if div2.get('class') ==  [u'title', u'name'] :
                     nom = div2.text.strip()
-                
+
             for a in div.find_all('a'):
-                if a.text.strip() == "RSS" :
+                if a.get('class') == [u'podcast'] :
                     lien =  a.get('href')
 
         if nom != '':
