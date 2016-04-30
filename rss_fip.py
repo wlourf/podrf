@@ -43,19 +43,19 @@ for a in soup.find_all('a'):
         liens.append(a.get('href'))
 
 for idx in range(len(noms)):
-    nom, lien = noms[idx], liens[idx]
-#    print  unicode(nom).encode('utf-8') , ";", lien
+    if idx < len(liens): #si dernièeres émissions sans liens
+        nom, lien = noms[idx], liens[idx]
  
-    if nom != '':
-        if args.FORMAT :
-            if lien != '':
-                emission = unicode(nom.upper()).encode('utf-8')
-                emission = emission.replace('/', '-')
-                emission = emission.replace('’', '\'')
-                print "[" + emission + "]"
-                print "url =" , lien, "\n"
-        else:
-            print  unicode(nom).encode('utf-8') , ";", lien
-        nom, lien  = '', ''
+        if nom != '':
+            if args.FORMAT :
+                if lien != '':
+                    emission = unicode(nom.upper()).encode('utf-8')
+                    emission = emission.replace('/', '-')
+                    emission = emission.replace('’', '\'')
+                    print "[" + emission + "]"
+                    print "url =" , lien, "\n"
+            else:
+                print  unicode(nom).encode('utf-8') , ";", lien
+            nom, lien  = '', ''
 
-    print         
+        print
