@@ -305,9 +305,8 @@ def download_podcasts(emission, arrPodcasts, params):
 
 
         #tag 
-        #print "Tag"
         tag = eyeD3.Tag()
-        tag.link(file_name, eyeD3.ID3_V2)
+        tag.link(file_name)#, eyeD3.ID3_V2) default = ANY
         tag.remove()
         tag.removeComments()
         tag.removeImages()
@@ -329,6 +328,11 @@ def download_podcasts(emission, arrPodcasts, params):
 
         if 'genre' in emission.keys():            
             tag.setGenre(emission['genre'])
+
+        #utf8 march pas avec v2.3
+        tag.header.setVersion(eyeD3.ID3_V2_4)
+        tag.setTextEncoding(eyeD3.UTF_8_ENCODING )
+
             
         try:        
             tag.update()
