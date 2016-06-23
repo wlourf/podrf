@@ -30,22 +30,21 @@ f.close()
 soup = BeautifulSoup(html_doc, 'html.parser')
 
 #affichage
-print "#", soup.title.text, "\n"
+print "#", soup.title.text.encode('utf-8'), "\n"
 
 nom, lien  = '', ''
 
-for a in soup.find_all('a'):
+# récupère le lien des pages rss/xml des podcasts
 
-    #récupère le lien des pages rss/xml des podcasts
-    if a.get('class') == [u'podrss'] :
-        lien = a.get('href')
-       
-    #récupère le titre de l'émission
-    if a.get('href')[:10] == '/emission-' :
-        if a.text != u'' and a.get('class') != [u'visuel']:
-            nom = a.text.strip()
+for article in soup.find_all('article'):
+    if article.get('class') == [u'rich-section-list-item']:
+        for a in article.find_all('a'):
+            if a.get('class') == [u'rich-section-list-item-content-title'] :
+                nom = a.text.strip() # titre de l'émission
+            if a.get('href')[:38] == 'http://radiofrance-podcast.net/podcast' :
+                lien =  a.get('href') 
             
-    if nom != '':
+    if nom != ""  :
         if args.FORMAT :
             if lien != '':
                 emission = unicode(nom.upper()).encode('utf-8')
