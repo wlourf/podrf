@@ -49,11 +49,11 @@ def get_urls(format=False, filter=""):
         print "#", soup.title.text.encode('utf-8'), "\n"
 
     for div in soup.find_all('div'):
-        if div.get('class') == [u'bloc-teaser',u'concept']:
+        if div.get('class') == [u'bloc-concept',u'concept']:
             #print (div.encode('utf8'))
-            for div2 in div.find_all('div'):
-                if div2.get('class') ==  [u'title', u'name'] :
-                    nom = div2.text.strip()
+            for h2 in div.find_all('h2'):
+                if h2.get('class') ==  [u'title', u'name'] :
+                    nom = h2.text.strip()
 
             for a in div.find_all('a'):
                 if a.get('class') == [u'podcast'] :
