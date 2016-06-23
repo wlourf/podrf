@@ -38,12 +38,14 @@ def get_urls(format = False, display=True):
     noms, liens= [], []
     listing = []
 
+#    for article in soup.find_all('article'):
+#        if article.get('class') == [u'rubrique_emission',u'block', u'teaser-responsive-list'] :
     for h in soup.find_all('h1'):
         if h.get('class') == [u'title']:
             noms.append(h.text)
 
     for a in soup.find_all('a'):
-        if a.text == 'podcaster via rss':
+        if a.text == 'RSS':
             liens.append(a.get('href'))
 
     for idx in range(len(noms)):
